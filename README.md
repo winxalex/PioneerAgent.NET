@@ -1,4 +1,4 @@
-# Chat2Report QuickStart
+# QuickStart
 
 This guide provides a basic overview of how to configure and run agents and workflows using the JSON-defined framework.
 
