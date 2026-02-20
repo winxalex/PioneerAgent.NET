@@ -155,6 +155,13 @@ var builder = WebApplication.CreateBuilder(args);
 AgentsWebBuilder appBuilder = new AgentsWebBuilder(builder);
 appBuilder.UseInProcessRuntime();
 
+// 1. Register the default Handlebars template engine.
+builder.Services.AddSingleton<ITemplateEngine, HandlebarsTemplateEngine>();
+
+// 2. Register the default services for pausing and terminating the workflow.
+builder.Services.AddSingleton<IWorkflowPauseService, DefaultWorkflowPauseService>();
+builder.Services.AddSingleton<ITopicTerminationService, DefaultTopicTerminationService>();
+
 // --- Register all workflow step implementations ---
 // This tells the framework which C# class to use for a given step type from JSON.
 appBuilder.Services.AddKeyedTransient<IBaseWorkflowStep, LlmCallStep>("LlmCall");
@@ -183,40 +190,7 @@ app.Run();
 
 This guide explains how to configure basic services and start a workflow in the project.
 
-### 1. Adding and Configuring Services
-
-To use `ITemplateEngine`, `ITopicTerminationService`, and `IWorkflowPauseService`, you first need to register them in your Dependency Injection (DI) container, which is most often done in `Program.cs`.
-
-**Registration in `Program.cs`:**
-
-```csharp
-// In Program.cs, in the section where you configure services:
-
-// 1. Register the default Handlebars template engine.
-builder.Services.AddSingleton<ITemplateEngine, HandlebarsTemplateEngine>();
-
-// 2. Register the default services for pausing and terminating the workflow.
-builder.Services.AddSingleton<IWorkflowPauseService, DefaultWorkflowPauseService>();
-builder.Services.AddSingleton<ITopicTerminationService, DefaultTopicTerminationService>();
-
-// ... other service registrations
-```
-
-### 2. How to use `ITemplateEngine`
-
-`ITemplateEngine` is used for dynamic content generation (most often a prompt) from a predefined template.
-
-**Step 1: Create a template file**
-
-Create a new file in `Chat2Report/Prompts/`, for example `my_prompt.md`.
-
-_Content of `Chat2Report/Prompts/my_prompt.md`_:
-
-```markdown
-You are an assistant that needs to analyze the following user request: "{{user_query}}".
-```
-
-### 3. Explanation: How to Start a Workflow
+### Explanation: How to Start a Workflow
 
 The following code shows how a workflow is initiated.
 
